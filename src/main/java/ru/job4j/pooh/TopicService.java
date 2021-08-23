@@ -9,6 +9,9 @@ public class TopicService implements Service {
     private final ConcurrentHashMap<String, LinkedBlockingQueue<String>> topics =
             new ConcurrentHashMap<>();
 
+    private final ConcurrentHashMap<Integer, LinkedBlockingQueue<String>> topicById =
+            new ConcurrentHashMap<>();
+
     private final ConcurrentHashMap<String, CopyOnWriteArrayList<Integer>> topicSubscribers =
             new ConcurrentHashMap<>() {{
                 put("moscow", new CopyOnWriteArrayList<>() {{
@@ -35,10 +38,10 @@ public class TopicService implements Service {
                 String idSubscriber = buffText[2];
                 topicSubscribers.putIfAbsent(name, new CopyOnWriteArrayList<>());
                 CopyOnWriteArrayList<Integer> buff = topicSubscribers.get(name);
-                if (buff.contains(Integer.parseInt(idSubscriber))) {
-                    LinkedBlockingQueue<String> innerQueueCopy = new LinkedBlockingQueue<>(innerQueue);
-                    responseResult = new Resp(innerQueueCopy.poll(), 200);
+                for (Integer elem : buff) {
+                    topicById.putIfAbsent(elem, new LinkedBlockingQueue<>(innerQueue));
                 }
+                responseResult = new Resp(topicById.get(Integer.parseInt(idSubscriber)).poll(), 200);
             } catch (Exception e) {
                 e.printStackTrace();
             }
