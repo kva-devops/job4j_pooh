@@ -1,10 +1,7 @@
 package ru.job4j.pooh;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class TopicService implements Service {
@@ -12,14 +9,12 @@ public class TopicService implements Service {
     private final ConcurrentHashMap<String, LinkedBlockingQueue<String>> topics =
             new ConcurrentHashMap<>();
 
-    private final Map<Integer, List<String>> subscribers =
-            new HashMap<>() {{
-               put(1, new ArrayList<>() {{
-                   add("moscow");
-               }});
-               put(2, new ArrayList<>() {{
-                   add("moscow");
-               }});
+    private final ConcurrentHashMap<String, CopyOnWriteArrayList<Integer>> topicSubscribers =
+            new ConcurrentHashMap<>() {{
+                put("moscow", new CopyOnWriteArrayList<>() {{
+                    add(1);
+                    add(2);
+                }});
             }};
 
     @Override
@@ -38,8 +33,12 @@ public class TopicService implements Service {
         } else if ("GET".equals(method)) {
             try {
                 String idSubscriber = buffText[2];
-                responseResult = new Resp(topics.get(name).poll(), 200);
-                System.out.println(idSubscriber);
+                topicSubscribers.putIfAbsent(name, new CopyOnWriteArrayList<>());
+                CopyOnWriteArrayList<Integer> buff = topicSubscribers.get(name);
+                if (buff.contains(Integer.parseInt(idSubscriber))) {
+                    LinkedBlockingQueue<String> innerQueueCopy = new LinkedBlockingQueue<>(innerQueue);
+                    responseResult = new Resp(innerQueueCopy.poll(), 200);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

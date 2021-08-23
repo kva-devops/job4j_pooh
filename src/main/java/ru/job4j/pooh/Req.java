@@ -19,7 +19,7 @@ public class Req {
         String mode = buffModeAndName[1];
         String name = buffModeAndName[2];
         String idSubscriber = "";
-        if ("GET".equals(method)) {
+        if ("GET".equals(method) && "topic".equals(mode)) {
             idSubscriber = buffModeAndName[3];
         }
         String message = buffAll[buffAll.length - 1];
