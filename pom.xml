@@ -61,7 +61,7 @@
               <finalName>Wget</finalName>
               <transformers>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <mainClass>ru.job4j.concurrent.Wget</mainClass>
+                  <mainClass>ru.job4j.pooh.PoohServer</mainClass>
                 </transformer>
               </transformers>
             </configuration>
