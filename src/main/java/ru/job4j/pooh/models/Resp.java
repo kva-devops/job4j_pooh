@@ -1,7 +1,16 @@
-package ru.job4j.pooh;
+package ru.job4j.pooh.models;
 
+/**
+ * Model of user's response
+ */
 public class Resp {
+    /**
+     * Text of message
+     */
     private final String text;
+    /**
+     * Status of sending (e.g. 200)
+     */
     private final int status;
 
     public Resp(String text, int status) {
@@ -9,11 +18,11 @@ public class Resp {
         this.status = status;
     }
 
-    public String text() {
+    public String getText() {
         return text;
     }
 
-    public int status() {
+    public int getStatus() {
         return status;
     }
 }

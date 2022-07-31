@@ -1,5 +1,10 @@
 package ru.job4j.pooh;
 
+import ru.job4j.pooh.models.Req;
+import ru.job4j.pooh.services.QueueService;
+import ru.job4j.pooh.services.Service;
+import ru.job4j.pooh.services.TopicService;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,12 +16,25 @@ import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Main server class
+ */
 public class PoohServer {
-    private final HashMap<String, Service> modes = new HashMap<>();
+    /**
+     * Map of operating modes
+     */
+    private final HashMap<String, Service> availableServicesMap = new HashMap<>();
 
+    /**
+     * Method for starting server:
+     * - add operating modes,
+     * - create pool of connections
+     * - starting server socket
+     * - request processing and response forming
+     */
     public void start() {
-        modes.put("queue", new QueueService());
-        modes.put("topic", new TopicService());
+        availableServicesMap.put("queue", new QueueService());
+        availableServicesMap.put("topic", new TopicService());
         ExecutorService pool = Executors.newFixedThreadPool(
                 Runtime.getRuntime().availableProcessors()
         );
@@ -30,9 +48,9 @@ public class PoohServer {
                         var total = input.read(buff);
                         var text = new String(Arrays.copyOfRange(buff, 0, total), StandardCharsets.UTF_8);
                         var req = Req.of(text);
-                        var resp = modes.get(req.mode()).process(req);
-                        out.write(("HTTP/1.1 " + resp.status() + " OK\r\n").getBytes());
-                        out.write((resp.text() + "\n").getBytes());
+                        var resp = availableServicesMap.get(req.getMode()).process(req);
+                        out.write(("HTTP/1.1 " + resp.getStatus() + " OK\r\n").getBytes());
+                        out.write((resp.getText() + "\n").getBytes());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -43,6 +61,9 @@ public class PoohServer {
         }
     }
 
+    /**
+     * Main thread of application
+     */
     public static void main(String[] args) {
         new PoohServer().start();
     }
