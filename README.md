@@ -67,8 +67,4 @@ If the topic is present, then the message is taken from the head of the recipien
 ## Contact
 Kutiavin Vladimir
 
-skype: tribuna87
-
-email: tribuna87@mail.ru
-
 telegram: @kutiavinvladimir
